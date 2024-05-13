@@ -46,7 +46,14 @@ const client = new MongoClient(uri, {
       console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
       // Ensures that the client will close when you finish/error
-      await client.close();
+    //   await client.close();
     }
   }
-  run().catch(console.dir);
+  run().catch(console.log);
+  app.get('/', (req, res) => {
+    res.send('All Assignments Server Running')
+  })
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
+  
