@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 3000;
@@ -39,6 +39,31 @@ const client = new MongoClient(uri, {
         const result = await assignmentCollection.insertOne(newAssignment);
         res.send(result);
       })
+
+     
+    app.get('/assignments', async (req, res) => {
+        const cursor = assignmentCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      })
+
+       // delete a card 
+    app.delete('/assignments/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        const result = await assignmentCollection.deleteOne(query);
+        res.send(result);
+      })
+
+      
+    // to update coffee cards 
+    app.get('/assignments/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await assignmentCollection.findOne(query);
+      res.send(result);
+    })
+
 
 
       // Send a ping to confirm a successful connection
