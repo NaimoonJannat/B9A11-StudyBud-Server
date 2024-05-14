@@ -31,6 +31,22 @@ const client = new MongoClient(uri, {
 
      const database = client.db('StudyBud');
      const assignmentCollection = database.collection("allAssignments");
+     const pendingCollection = database.collection("pendingAssignments");
+
+      // to send pending assignments backend 
+    app.post('/pending', async (req, res) => {
+      const submittedAssignment = req.body;
+      console.log(submittedAssignment);
+      const result = await pendingCollection.insertOne(submittedAssignment);
+      res.send(result);
+    })
+
+   
+  app.get('/pending', async (req, res) => {
+      const cursor = pendingCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
      // to send assignments backend 
     app.post('/assignments', async (req, res) => {
@@ -56,11 +72,30 @@ const client = new MongoClient(uri, {
       })
 
       
-    // to update coffee cards 
+    // to update cards 
     app.get('/assignments/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await assignmentCollection.findOne(query);
+      res.send(result);
+    })
+
+    app.put('/assignments/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedTask = req.body;
+      const task = {
+        $set: {
+        title: updatedTask.title,
+        description: updatedTask.description,
+        fullmark: updatedTask.fullmark,
+        difficulty: updatedTask.difficulty,
+        duedate: updatedTask.duedate,
+        photo: updatedTask.photo
+        }
+      }
+      const result = await assignmentCollection.updateOne(filter, task);
       res.send(result);
     })
 
