@@ -32,6 +32,22 @@ const client = new MongoClient(uri, {
      const database = client.db('StudyBud');
      const assignmentCollection = database.collection("allAssignments");
      const pendingCollection = database.collection("pendingAssignments");
+     const markingCollection = database.collection("markedAssignments");
+
+      // to send marked assignments backend 
+    app.post('/marked', async (req, res) => {
+      const markedAssignment = req.body;
+      console.log(markedAssignment);
+      const result = await markingCollection.insertOne(markedAssignment);
+      res.send(result);
+    })
+
+   
+  app.get('/marked', async (req, res) => {
+      const cursor = markingCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
       // to send pending assignments backend 
     app.post('/pending', async (req, res) => {
@@ -47,6 +63,15 @@ const client = new MongoClient(uri, {
       const result = await cursor.toArray();
       res.send(result);
     })
+
+      // delete a card from pending
+      app.delete('/pending/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        const result = await pendingCollection.deleteOne(query);
+        res.send(result);
+      })
+      
 
      // to send assignments backend 
     app.post('/assignments', async (req, res) => {
